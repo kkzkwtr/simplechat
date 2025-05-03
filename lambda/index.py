@@ -49,6 +49,10 @@ def lambda_handler(event, context):
         print("Using FASTAPI_URL",url)
         # print("Using model:", MODEL_ID)
         
+        #システムプロンプト""
+        system_prompt = "100字以内で出力すること。文体は「だ・である」調で統一すること。文末に字数を表示すること"
+        message = f"条件:{system_prompt}\n\n入力:{message}"
+        print(message)
         try:
             #API用リクエストペイロード構築
             request_payload = {
@@ -89,18 +93,19 @@ def lambda_handler(event, context):
         
         # Nova Liteモデル用のリクエストペイロードを構築
         # 会話履歴を含める
-        # bedrock_messages = []
-        # for msg in messages:
-        #     if msg["role"] == "user":
-        #         bedrock_messages.append({
-        #             "role": "user",
-        #             "content": [{"text": msg["content"]}]
-        #         })
-        #     elif msg["role"] == "assistant":
-        #         bedrock_messages.append({
-        #             "role": "assistant", 
-        #             "content": [{"text": msg["content"]}]
-        #         })
+        bedrock_messages = []
+        for msg in messages:
+            if msg["role"] == "user":
+                bedrock_messages.append({
+                    "role": "user",
+                    "content": [{"text": msg["content"]}]
+                })
+            elif msg["role"] == "assistant":
+                bedrock_messages.append({
+                    "role": "assistant", 
+                    "content": [{"text": msg["content"]}]
+                })
+        print(bedrock_messages)
         
         # invoke_model用のリクエストペイロード
         # request_payload = {
@@ -137,7 +142,6 @@ def lambda_handler(event, context):
             "role": "assistant",
             "content": assistant_response
         })
-        
         # 成功レスポンスの返却
         return {
             "statusCode": 200,
